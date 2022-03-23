@@ -13,9 +13,9 @@ func NewEvaluator() *Evaluator {
 type Evaluator struct {
 }
 
-// ExpressionFunction can be called from within expressions.
+// 可以从表达式内部调用 ExpressionFunction。
 //
-// The returned object needs to have one of the following types: `nil`, `bool`, `int`, `float64`, `[]interface{}` or `map[string]interface{}`.
+// 返回的对象必须是下面类型中的一种： `nil`, `bool`, `int`, `float64`, `[]interface{}` or `map[string]interface{}`.
 type ExpressionFunction = func(args ...interface{}) (interface{}, error)
 
 // Evaluate the given expression string.

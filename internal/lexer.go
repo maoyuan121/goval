@@ -28,6 +28,9 @@ type Lexer struct {
 	functions map[string]ExpressionFunction
 }
 
+// @src 表达式
+// @variables 变量
+// @functions 函数
 func NewLexer(src string, variables map[string]interface{}, functions map[string]ExpressionFunction) *Lexer {
 	if variables == nil {
 		variables = map[string]interface{}{}

@@ -6,18 +6,17 @@ goval
 [![Coverage Status](https://coveralls.io/repos/github/maja42/goval/badge.svg?branch=master)](https://coveralls.io/github/maja42/goval?branch=master)
 [![GoDoc](https://godoc.org/github.com/maja42/goval?status.svg)](https://godoc.org/github.com/maja42/goval)
 
+这个库允许程序计算任意算术/字符串/逻辑表达式。
+支持访问变量和调用自定义函数。
 
-This library allows programs to evaluate arbitrary arithmetic/string/logic expressions.
-Accessing variables and calling custom functions is supported.
+这个项目被认为是稳定的，并且已经在生产系统中使用。
+对于任何问题、反馈和错误报告，请使用 bug-reports。
 
-This project is considered stable and already used in production systems. \
-Please use the issue-tracker for any questions, feedback and bug-reports.
-
-This project is licensed under the terms of the MIT license.
+开源协议 MIT license。
 
 # Demo
 
-A small CLI demo that evaluates expressions can be found in the example folder:
+一个对表达式求值的 CLI 小演示可以在 example 文件夹中找到:
 
 ```
 go get -u github.com/maja42/goval
@@ -30,14 +29,14 @@ go run example/main.go
 
 # Usage
 
-Minimal example:
+小演示：
 
 ```go
 eval := goval.NewEvaluator()
 result, err := eval.Evaluate(`42 > 21`, nil, nil) // Returns <true, nil>
 ```
 
-Accessing variables:
+访问变量：
 ```go
 eval := goval.NewEvaluator()
 variables := map[string]interface{}{
@@ -47,9 +46,7 @@ variables := map[string]interface{}{
 result, err := eval.Evaluate(`uploaded * 100 / total`, variables, nil)  // Returns <36, nil>
 ```
 
-
-Calling functions:
-
+调用函数：
 ```go
 // Implementing strlen()
 eval := goval.NewEvaluator()
@@ -67,7 +64,7 @@ functions["strlen"] = func(args ...interface{}) (interface{}, error) {
 result, err := eval.Evaluate(`strlen(arch[:2]) + strlen("text")`, variables, functions) // Returns <6, nil>
 ```
 
-Custom functions allow the extension with arbitrary features like regex-matching:
+自定义函数允许扩展的任意特性，如 regex 匹配:
 ```go
 // Implementing regular expressions (error handling omitted)
 functions := make(map[string]goval.ExpressionFunction)
@@ -82,28 +79,26 @@ eval.Evaluate(`matches("text", "[a-z]+")`, nil, functions)  // Returns <true, ni
 eval.Evaluate(`matches("1234", "[a-z]+")`, nil, functions)  // Returns <false, nil>
 ```
 
+# 文档
 
+## 类型
 
-# Documentation
+这个库完全支持以下类型:`nil`, `bool`, `int`, `float64`, `string`, `[]interface{}` (=arrays) and `map[string]interface{}` (=objects). 
 
-## Types
+在表达式中，`int` 和 `float64` 都具有 `number` 类型，并且是完全透明的。\
+如果需要，数值将在 `int` 和 `float64` 之间自动转换，只要不丢失精度。
 
-This library fully supports the following types: `nil`, `bool`, `int`, `float64`, `string`, `[]interface{}` (=arrays) and `map[string]interface{}` (=objects). 
+数组和对象是无类型的。它们可以存储任何其他值(“混合数组”)。
 
-Within expressions, `int` and `float64` both have the type `number` and are completely transparent.\
-If necessary, numerical values will be automatically converted between `int` and `float64`, as long as no precision is lost.
+支持 struct 以保持功能的清晰和可管理。
+它们会引入太多的边缘情况和松散的结果，因此超出了范围。
 
-Arrays and Objects are untyped. They can store any other value ("mixed arrays").
+## 变量
 
-Structs are note supported to keep the functionality clear and manageable. 
-They would introduce too many edge cases and loose ends and are therefore out-of-scope. 
+可以直接访问自定义变量。
+变量是只读的，不能从表达式中修改。
 
-## Variables
-
-It is possible to directly access custom-defined variables.
-Variables are read-only and cannot be modified from within expressions.
-
-Examples:
+实例：
 
 ```
 var
@@ -117,9 +112,9 @@ var["fie" + "ld"].field[42 - var2][0]
 
 ## Functions
 
-It is possible to call custom-defined functions from within expressions.
+可以从表达式中调用自定义函数。
 
-Examples:
+实例：
 
 ```
 rand()
@@ -130,11 +125,11 @@ len("te" + "xt")
 
 ## Literals
 
-Any literal can be defined within expressions. 
-String literals can be put in double-quotes `"` or back-ticks \`.
-Hex-literals start with the prefix `0x`.
+任何字面量都可以在表达式中定义。
+字符串字面值可以放在双引号 `"` 或反勾号 \`中。
+十六进制字面值以前缀 `0x` 开始。
 
-Examples:
+实例：
 
 ```
 nil
@@ -173,29 +168,29 @@ Examples:
 {"a": {"b": 42}}["a"]["b"]  // 42
 ```
 
-## Precedence
+## 优先级
 
-Operator precedence strictly follows [C/C++ rules](http://en.cppreference.com/w/cpp/language/operator_precedence).
+严格遵循操作符优先级 [C/C++ rules](http://en.cppreference.com/w/cpp/language/operator_precedence)。
 
-Parenthesis `()` is used to control precedence.
+括号 `()` 用于控制优先级。
 
-Examples:
+例子：
 
 ```
 1 + 2 * 3    // 7
 (1 + 2) * 3  // 9
 ```
 
-## Operators
+## 操作符
 
-### Arithmetic
+### 算术
 
-#### Arithmetic `+` `-` `*` `/`
+#### 算术 `+` `-` `*` `/`
 
-If both sides are integers, the resulting value is also an integer.
-Otherwise, the result will be a floating point number.
+如果两边都是整数，则结果值也是整数。
+否则，结果将是一个浮点数。
 
-Examples:
+例子：
 
 ```
 3 + 4               // 7
@@ -208,10 +203,10 @@ Examples:
 
 #### Modulo `%`
 
-If both sides are integers, the resulting value is also an integer.
-Otherwise, the result will be a floating point number.
+如果两边都是整数，则结果值也是整数。
+否则，结果将是一个浮点数。
 
-Examples:
+例子：
 
 ```
 4 % 3       // 1
@@ -220,11 +215,9 @@ Examples:
 10 % 3.5    // 3.0
 ```
 
-#### Negation `-` (unary minus)
+#### 负数 `-` (unary minus)
 
-Negates the number on the right.
-
-Examples:
+例子：
 
 ```
 -4       // -4
@@ -238,12 +231,12 @@ Examples:
 
 ### Concatenation
 
-#### String concatenation `+`
+#### 字符串连接 `+`
 
-If either the left or right side of the `+` operator is a `string`, a string concatenation is performed.
-Supports strings, numbers, booleans and nil.
+如果 `+` 操作符的左边或右边有一个是 `string`，则执行字符串连接。
+支持字符串、数字、布尔值和nil。
 
-Examples:
+例子:
 
 ```
 "text" + 42     // "text42"
@@ -253,23 +246,23 @@ Examples:
 "text" + true   // "texttrue"
 ```
 
-#### Array concatenation `+`
+#### 数组连接 `+`
 
-If both sides of the `+` operator are arrays, they are concatenated
+如果 `+` 操作符的两边都是数组，则将它们连接起来
 
-Examples:
+例子：
 
 ```
 [0, 1] + [2, 3]          // [0, 1, 2, 3]
 [0] + [1] + [[2]] + []   // [0, 1, [2]]
 ```
 
-#### Object concatenation `+`
+#### 对象连接 `+`
 
-If both sides of the `+` operator are objects, their fields are combined into a new object.
-If both objects contain the same keys, the value of the right object will override those of the left.
+如果 `+` 操作符的两边都是对象，则它们的字段将组合成一个新对象。
+如果两个对象包含相同的键，则右边对象的值将覆盖左边对象的值。
 
-Examples:
+例子:
 
 ```
 {"a": 1} + {"b": 2} + {"c": 3}         // {"a": 1, "b": 2, "c": 3}
@@ -281,17 +274,14 @@ Examples:
 
 #### Equals `==`, NotEquals `!=`
 
-Performs a deep-compare between the two operands.
-When comparing `int` and `float64`, 
-the integer will be cast to a floating point number.
+在两个操作数之间进行深度比较。
+比较 `int` 和 `float64` 时，该整数将被转换为浮点数。
 
 #### Comparisons `<`, `>`, `<=`, `>=`
 
-Compares two numbers. If one side of the operator is an integer and the other is a floating point number,
-the integer number will be cast. This might lead to unexpected results for very big numbers which are rounded
-during that process.
+比较两个数字。如果运算符的一边是整数，另一边是浮点数，整数值将被转换。对于在此过程中四舍五入的非常大的数字，这可能会导致意想不到的结果。
 
-Examples:
+例子:
 
 ```
 3 <-4        // false
@@ -302,7 +292,7 @@ Examples:
 
 #### And `&&`, Or `||`
 
-Examples:
+例子:
 
 ```
 true && true             // true
@@ -316,7 +306,7 @@ false && false || true   // true
 
 Inverts the boolean on the right.
 
-Examples:
+例子：
 
 ```
 !true       // false
@@ -328,10 +318,10 @@ Examples:
 
 ### Ternary `? :`
 
-If the expression resolves to `true`, the operator resolves to the left operand. \
-If the expression resolves to `false`, the operator resolves to the right operand.
+如果表达式解析为 `true`，则运算符解析为左操作数。＼
+如果表达式解析为 `false`，则运算符解析为右操作数。
 
-Examples:
+例子：
 
 ```
 true  ? 1 : 2                         // 1
@@ -343,9 +333,9 @@ false ? 1 : 2                         // 2
 false ? (true ? 1:2) : (true ? 3:4)   // 3
 ```
 
+请注意，所有操作数都已解析(没有短路)。
 
-Note that all operands are resolved (no short-circuiting). 
-In the following example, both functions are called (the return value of `func2` is simply ignored):
+在下面的例子中，两个函数都被调用了(`func2` 的返回值被简单地忽略了):
 
 ```
 true ? func1() : func2()
@@ -425,9 +415,9 @@ Examples:
 
 #### Array contains `in`
 
-Returns true or false whether the array contains a specific element.
+如果数组包含特定元素，则返回 true 或 false。
 
-Examples:
+例子:
 
 ```
 "txt" in [nil, "hello", "txt", 42]   // true
